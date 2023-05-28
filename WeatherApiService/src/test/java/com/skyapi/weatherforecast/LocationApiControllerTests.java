@@ -100,4 +100,50 @@ public class LocationApiControllerTests {
                 .andExpect(jsonPath("$[0].city_name", is("New York City")))
                 .andDo(print());
     }
+
+    @Test
+    public void testGetShouldReturn405MethodNotAllowed() throws Exception {
+        String requestURI = END_POINT_PATH + "/ABCDE";
+
+        mockMvc.perform(post(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetShouldReturn404NotFound() throws Exception {
+        String requestURI = END_POINT_PATH + "/ABCDE";
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetShouldReturn200OK() throws Exception {
+        String code = "LACA_USA";
+        String requestURI = END_POINT_PATH + "/" + code;
+
+        Location location = new Location();
+        location.setCode("LACA_USA");
+        location.setCityName("Los Angeles");
+        location.setRegionName("California");
+        location.setCountryName("United States of America");
+        location.setCountryCode("US");
+        location.setEnabled(true);
+
+        Mockito.when(service.get(code)).thenReturn(location);
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.code", is(code)))
+                .andExpect(jsonPath("$.city_name", is("Los Angeles")))
+                .andDo(print());
+    }
+
 }
