@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -203,6 +204,31 @@ public class LocationApiControllerTests {
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.code", is("NYC_USA")))
                 .andExpect(jsonPath("$.city_name", is("New York City")))
+                .andDo(print());
+    }
+
+    @Test
+    public void testDeleteShouldReturn404NotFound() throws Exception, LocationNotFoundException {
+        String code = "LACA_US";
+        String requestURI = END_POINT_PATH + "/" + code;
+
+        LocationNotFoundException ex = new LocationNotFoundException(code);
+        Mockito.doThrow(ex).when(service).delete(code);
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+    @Test
+    public void testDeleteShouldReturn204NoContent() throws Exception, LocationNotFoundException {
+        String code = "LACA_USA";
+        String requestURI = END_POINT_PATH + "/" + code;
+
+        Mockito.doNothing().when(service).delete(code);
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isNoContent())
                 .andDo(print());
     }
 
