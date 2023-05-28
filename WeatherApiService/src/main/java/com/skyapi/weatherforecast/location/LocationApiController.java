@@ -45,4 +45,15 @@ public class LocationApiController {
 
         return ResponseEntity.ok(location);
     }
+
+    @PutMapping
+    public ResponseEntity<?> updateLocation(@RequestBody @Valid Location location) {
+        try {
+            Location updatedLocation = service.update(location);
+
+            return ResponseEntity.ok(updatedLocation);
+        } catch (LocationNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
